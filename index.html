@@ -1,0 +1,577 @@
+<!doctype html>
+<html>
+<head>
+  <title>good</title>
+      <link rel="stylesheet" type="text/css" href="style_menu.css">
+  <meta charset="utf-8">
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+
+</head>
+<body>
+   <div id="container">
+                        <div id="header"><a  id="login_name">Гость</a>&ensp;<a id="exit">Вход</a></div>
+						
+						<div id="navigation_room">Комнаты
+						</div>
+						<div id="navigation_menu">Действие
+						</div>
+						
+
+						
+						
+                        <div id="menu">
+						<ul id="my_menu">
+<!--
+							<li><a ontouchstart = "create();"><span>Создать</span></a></li>
+	-->
+							<li><a ><span onmousedown = "create();">Создать</span></a></li>
+							<li><a ><span onclick = "send_room_name()">Вступить</span></a></li>
+							<li><a ><span onclick = "update();">Обновить</span></a></li>
+							<!-- 
+							<li><a onmousedown = "find();"><span>Найти</span></a></li>
+							-->
+						</ul>
+						 <div id = "search">
+									<input type = "text" placeholder = "Поиск" id = "find_on" ></input>
+						</div>
+                        </div>
+						<div id="content">
+							<ul id="room_list" >
+							
+
+							</ul>
+							<table cellpadding = "2" cellspacing = "2">
+								<tr>
+									<td class = "colum1">default</td>
+									<td class = "colum2">0/0</td>
+								</tr>
+																<tr>
+									<td class = "colum1">default2</td>
+									<td class = "colum2">0/0</td>
+								</tr>
+
+							</table>
+						
+                        </div>
+
+						
+                        <div id="clear">           </div>
+            </div>		
+						<div id="glass">
+						</div>
+						<div id = "registration">
+							<div id = "authorization"> 
+							
+
+								<h1 align="center">Добро пожаловать!</h1>
+								
+								<div id='authorization_info'>
+								<table cellpadding="0" cellspacing="2">
+								<tr> <td class = "col1">Логин:</td><td class = "col2"><input id = "login"  maxlength="20"></input> </td></tr>
+								<tr> <td class = "col1">Пароль: </td><td class = "col2"><input  id = "pass"  type="password"  maxlength="50"></input> </td></tr>
+								</table>
+								<!--<div class="check">
+									<div class = "remember" ><input type="checkbox"  >Запомнить</input></div>
+								</div> -->
+								<div class="check">
+									<div class = "registration_ok" onclick = "check_input_to_site();">Вход</div>
+									<div class = "registration_cancel" onclick = " window_login_close();">Отмена</div>
+								</div>
+								<div class="check">
+									<div class = "registration_ref0" onclick="authorization.style.display ='none';  window_registration_open();"><u>Регистрация</u></div>
+									<div class = "registration_ref1" onclick = "window_forgot_open();"><u>Забыли пароль?</u></div>
+								</div>
+								
+								</div>
+								<div id='step0_forgot_pass'>
+									<p>Введите адрес Вашей электронной почты </p>
+									<table cellpadding="0" cellspacing="2">
+									<tr> <td class = "col1">Адрес:</td><td class = "col2"><input id = "mail_forgot"  maxlength="50"></input> </td></tr>
+									</table>
+									<div class = "registration_ok" id = "forgot_ok" onclick = "step1_forgot_pass();">Ок</div>
+									<div class = "registration_cancel" onclick = " window_forgot_close();">Отмена</div>
+								</div>
+	
+								<div id='step1_forgot_pass'>
+									<p>Введите код из письма</p>
+									<table cellpadding="0" cellspacing="2">
+									<tr> <td class = "col1">Код из письма:</td><td class = "col2"><input id = "code_forgot"  maxlength="20"></input> </td></tr>
+									</table>
+									<div class = "registration_ok" id = "forgot_ok" onclick = "step2_forgot_pass();">Ок</div>
+									<div class = "registration_cancel" onclick = " window_forgot_close();">Отмена</div>
+								</div>		
+	
+									<div id='step2_forgot_pass'>
+									<p>Введите новый пароль</p>
+									<table cellpadding="0" cellspacing="2">
+									<tr> <td class = "col1">Новый пароль:</td><td class = "col2"><input type="password" id = "pass0_forgot"  maxlength="50"></input> </td></tr>
+									<tr> <td class = "col1">Пароль еще раз:</td><td class = "col2"><input type="password" id = "pass1_forgot"  maxlength="50"></input> </td></tr>									
+									</table>
+									<div class = "registration_ok" id = "forgot_ok" onclick = "finish_forgot_pass();">Ок</div>
+									<div class = "registration_cancel" onclick = " window_forgot_close();">Отмена</div>
+								</div>							
+								
+
+								
+								
+							</div>
+							<div id = "registration_new"> 
+								<h1 align="center">Регистрация</h1>
+								<div id='reg_new_content'>
+									<table cellpadding="0" cellspacing="2">
+										<tr> <td class = "col1">Логин:</td><td class = "col2"><input id = "login_reg"  maxlength="20"></input> </td></tr>
+										<tr> <td class = "col1">Пароль:</td><td class = "col2"><input type="password"  id = "pass_reg1" maxlength="50"></input> </td></tr>
+										<tr> <td class = "col1">Пароль еще раз:</td><td class = "col2"><input  type="password" id = "pass_reg2"   maxlength="50"></input> </td></tr>
+										<tr> <td class = "col1">Адрес электронной <br> почты:</td><td class = "col2"><input id = "mail_reg"  maxlength="50"></input> </td></tr>
+									</table>
+									<div class = "registration_ok" onclick = "check_reg_to_site();">Далее</div>
+									<div class = "registration_cancel" onclick = " window_registration_close();">Отмена</div>
+								</div>	
+								<div id='reg_new_info'>
+									<p>На адрес Вашей электронной почты выслано письмо с кодом. </p>
+									<table cellpadding="0" cellspacing="2">
+									<tr> <td class = "col1">Введите его:</td><td class = "col2"><input id = "code_reg"  maxlength="20"></input> </td></tr>
+									</table>
+									<div class = "registration_ok" onclick = "finish_reg_to_site();">Ок</div>
+									<div class = "registration_cancel" onclick = " window_registration_close();">Отмена</div>
+								</div>	
+							</div>	
+						</div>
+</body>
+<script>
+	function $_GET(key) {
+						var s = window.location.search;
+						s = s.match(new RegExp(key + '=([^&=]+)'));
+						return s ? s[1] : false;
+	}
+
+	if (getCookie('userName') != null){
+		document.getElementById('login_name').innerHTML = getCookie('userName');
+		document.getElementById('exit').innerHTML = 'Выход';		
+	}else{
+	//window_login_open();
+	}
+	
+	
+	var log1 = getCookie('userName');
+	var log2 = getCookie('key');
+	
+	//alert(log1 + ' ' + log2);
+	var socket = io();	
+	
+	function check_input_to_site(){
+		var login = document.getElementById("login").value;
+		var pass = document.getElementById("pass").value;
+		send_keys( login, pass);
+		//var key = generate_key(50);
+		//var pass_send = coded(pass, key);
+	
+
+		{
+			socket.emit('chat message', login, pass, 'input');
+		}	
+	}
+
+	var menu_height=document.getElementById('menu');
+	var end_room_list = 1;//конец достигнут
+	
+	var input = document.getElementById('find_on');
+	update();
+	
+	
+	input.onkeyup = function () {
+   var filter = input.value;
+	var len = document.getElementById('room_list').getElementsByTagName('li').length;
+    for (var i = 0; i <len; i++) {
+		var name = document.getElementById('room_list').getElementsByTagName('li')[i].innerText ;
+		var hide_data = document.getElementById('room_list').getElementsByTagName('li')[i];
+		//var hide_data_of_count = document.getElementById('count_menu').getElementsByTagName('li')[i];
+		if(name.indexOf(filter)== -1){
+		hide_data.style.display = 'none';
+		//hide_data_of_count.style.display = 'none';
+		}
+		if (filter == '' || name.indexOf(filter)!= -1){
+		hide_data.style.display = '';
+		//hide_data_of_count.style.display = '';
+		}
+    }
+}
+	//буфер для выбранного элемента
+				var chooseLibuf = document.createElement('li');
+				
+				var choose_room = document.createElement('td');
+	//Создание  новой комнаты в списке
+		function create(){
+			
+			var room_name = 'room_' + randomInteger (1,100000);			
+			window.location.href = '/map/map.html/?id=' + room_name +'&'  + 'connect=' + 'no';
+			//add_room_name_to_table(room_name, '1/2');
+			return false;  
+	}
+	
+	function add_room_name_to_table(name, count){
+				//Добавление нового элемента
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				td1.className  = 'colum1';
+				var td2 = document.createElement('td');
+				td2.className  = 'colum2';
+				td1.innerHTML = name;
+				td2.innerHTML = count;
+				tr.appendChild(td1);
+				tr.appendChild(td2);
+				var table = document.getElementById('content').getElementsByTagName('table');
+				table[0].appendChild(tr);
+				
+				color_fall();
+				choose_room = tr;
+				color_td(choose_room);
+				
+	}
+	//var table_room = document.getElementById('content').getElementsByTagName('table');
+	document.getElementById('content').getElementsByTagName('table')[0].onmousedown = function(event){
+		var target = getEventTarget(event);
+		var parent = target.parentNode;
+		var first = parent.firstChild;
+		var resut = first.innerHTML;
+		color_fall();
+		color_td(parent);	
+		choose_room = parent;
+	}
+	function color_fall(){
+			if (choose_room.firstChild){
+			var td_last = choose_room.getElementsByTagName('td');
+			td_last[0].style.background = '';
+			td_last[1].style.background = '';
+			td_last[0].style.color = '';
+			td_last[1].style.color = '';	
+		}
+	}
+	function color_td(temp){
+
+		var tdnew = temp.getElementsByTagName('td');
+		tdnew[0].style.background = 'green';
+		tdnew[1].style.background = 'green';
+		tdnew[0].style.color = 'white';
+		tdnew[1].style.color = 'white';		
+	}
+	
+	function update(){
+		if (end_room_list){
+					end_room_list = 0;			
+					var container = document.getElementById('content').getElementsByTagName('table')[0];
+					while (container.firstChild) {
+						container.removeChild(container.firstChild);	
+					}
+					socket.emit('chat message', 'update', 'user', 'room01_update');
+		}
+			return false;
+	}
+	//скролл события
+	window.onscroll = function() {
+		/*
+		if (window.pageYOffset >= 125){
+			menu_height.style.position= "fixed";
+			menu_height.style.top= "0px";
+		}else{ 
+			menu_height.style.position= "static";
+			menu_height.style.top= "125px";
+		}
+		*/
+	}
+  function randomInteger(min, max) {
+  var rand = min + Math.random() * (max - min)
+  rand = Math.round(rand);
+  return rand;
+}
+	//Получение значения элемента в списке
+		function getEventTarget(e) {
+		e = e || window.event;
+		return e.target || e.srcElement; 
+	}
+	var ul = document.getElementById('room_list');
+	//var ilc = document.getElementByName('li');
+	ul.onmousedown  = function(event) {//для ПК
+	//ul. ontouchstart  = function(event) {
+        var target = getEventTarget(event);
+		var str = target.innerHTML;
+	    //	event.target.style.backgroundColor="#11AA55" ;	
+		if (str.search('<li')==-1 && str != 0){
+
+			chooseLibuf.style.backgroundColor="" ;
+			//сбрасываем фон у прошлого выделенного элемента		
+			target.style.backgroundColor="#11AA55" ;
+			chooseLibuf = target;
+			//$("html, body").animate({ scrollTop: 0 }, "slow"); //плавно переместиться вверх
+		}
+	};
+		$(function() {
+			socket.on('chat message', function(room_name, user, dodo) {
+					var temp = room_name.split(":");
+					room_name = temp[0];
+							if (dodo == 'room01_update' && room_name != 'end room list'){					
+										if (room_name != "room is exist"){
+														
+													var count = room_name;
+													if (temp[2] == '№2'){
+													count =  '1/2' ;
+														}	else{			
+													count =  '2/2' ;
+													}
+													add_room_name_to_table(room_name, count)
+													
+										}else{
+											alert('room with that name already exists');
+										}
+							}else if (room_name == 'end room list'){
+								end_room_list = 1;
+							}else if (dodo == 'input'){
+								if (room_name == 'correct'){
+										location.reload();
+									}else{
+										alert(room_name);
+										document.getElementById("pass").value = '';	
+									}
+							}
+							else if (dodo == 'error symbols'){
+								error_registration(room_name);
+							}
+							else if (dodo == 'registration_content'){
+									if (room_name == "This login or mail is already exist"){
+									error_registration("This login or mail is already exist");
+									}else if (room_name == 'Uncorrect mail'){
+									error_registration('Uncorrect mail');
+									}else if (room_name == "code was sent to your mail"){
+									
+										if (document.getElementById('mail_reg').value != ''){
+										reg_new_content.style.display = 'none';
+										reg_new_info.style.display = 'block';
+										}
+										if (document.getElementById('mail_forgot').value != ''){
+										document.getElementById('step0_forgot_pass').style.display = 'none';
+										document.getElementById('step1_forgot_pass').style.display = 'block';
+										}
+										
+										
+									}
+								}
+							else if (dodo == 'registration_finish'){
+								if (room_name == "uncorrect code"){
+									error_registration("uncorrect code");
+								}else if (room_name == "correct code"){
+										
+										
+										if (document.getElementById('code_reg').value != ''){
+											location.reload();
+										}
+										
+										if (document.getElementById('code_forgot').value != ''){
+											//переключаем окна
+											document.getElementById('login').value = user;
+											document.getElementById('step1_forgot_pass').style.display = 'none';
+											document.getElementById('step2_forgot_pass').style.display = 'block';
+										}
+										
+								}
+							}else if (dodo == 'forgot_finish'){
+										if (room_name == 'success'){	
+										
+											location.reload();
+
+										}else if (room_name == 'fail'){
+											error_registration(user);
+										}
+									
+							}
+							
+							
+							else{
+										alert('server error');
+							}
+			});
+		});
+	exit.onclick = function(){
+		var login = getCookie('userName') ;
+		//alert('login = ' + login);
+		if (login != null){
+			socket.emit('chat message', login, '', 'close session');
+		}
+		window_login_open();//открывает меню логин
+		
+	}
+	function window_login_open(){
+		document.body.style.overflow = "hidden";//запрещаем прокрутку
+		document.getElementById('login_name').innerHTML = 'Гость';
+		document.getElementById('exit').innerHTML = 'Вход';
+		document.getElementById('glass').style.display = 'block';
+		document.getElementById('registration').style.display = 'block';		
+		document.getElementById('authorization').style.display = 'block';
+		resetOnce('resetOnce');
+		document.getElementById('pass').value = "";
+		document.getElementById('pass_reg2').value = "";
+	}
+	function window_login_close(){
+		document.getElementById('glass').style.display = 'none';
+		document.getElementById('authorization').style.display = 'none';
+		clear_reg_inputs();
+	}
+		function window_registration_open(){
+		document.body.style.overflow = "";//запрещаем прокрутку
+		document.getElementById('glass').style.display = 'block';
+		document.getElementById('registration_new').style.display = 'block';
+		document.getElementById('reg_new_content').style.display = 'block';
+		document.getElementById('reg_new_info').style.display = 'none';
+	}
+	function clear_reg_inputs(){
+		document.getElementById('pass').value = "";
+		document.getElementById('pass_reg1').value = "";
+		document.getElementById('pass_reg2').value = "";
+		document.getElementById('login_reg').value = "";
+		document.getElementById('mail_reg').value = "";	
+		document.getElementById('code_reg').value = "";	
+											document.getElementById("login").value = '';	
+		}
+		function window_registration_close(){
+		
+		document.getElementById('glass').style.display = 'none';
+		document.getElementById('registration_new').style.display = 'none';
+		clear_reg_inputs();
+	}
+	function window_forgot_open(){
+		document.getElementById('authorization_info').style.display = 'none';
+		document.getElementById('step0_forgot_pass').style.display = 'block';
+	}
+	function window_forgot_close(){
+		document.getElementById('mail_forgot').value = '';
+		document.getElementById('code_forgot').value = '';
+		document.getElementById('pass0_forgot').value = '';		
+		document.getElementById('pass1_forgot').value = '';
+		
+		document.getElementById('authorization_info').style.display = 'block';
+		document.getElementById('step0_forgot_pass').style.display = 'none';
+		document.getElementById('step1_forgot_pass').style.display = 'none';
+		document.getElementById('step2_forgot_pass').style.display = 'none';	
+	}
+	
+	function step1_forgot_pass(){
+	var mail = document.getElementById("mail_forgot").value;
+		{
+			socket.emit('chat message', mail, '', 'forgot');
+		}	
+	}
+	function step2_forgot_pass(){
+	
+	
+
+	var mail = document.getElementById("mail_forgot").value;
+	var code = document.getElementById("code_forgot").value;
+	socket.emit('chat message', mail + ":" + code, '', 'forgot_code');
+		
+		
+	}
+	function finish_forgot_pass(){
+	var pass0 = document.getElementById('pass0_forgot').value;		
+	var pass1 = document.getElementById('pass1_forgot').value;
+	var mail = document.getElementById("mail_forgot").value;
+	
+		if (pass0 == pass1){
+		
+		send_keys(document.getElementById('login').value, pass1);
+			socket.emit('chat message', mail, pass0, 'forgot_finish');
+		}else{
+			error_registration('passwords do not coincide');
+		}
+		
+	}
+	
+	
+	
+	
+	function check_reg_to_site(){
+		var login = document.getElementById('login_reg').value;
+		var mail = document.getElementById('mail_reg').value;
+		var pass1 = document.getElementById('pass_reg1').value;
+		var pass2 = document.getElementById('pass_reg2').value;
+				if (pass1 == pass2){
+						send_keys(login, pass1);
+						socket.emit('chat message', login + ':' + mail, pass1, 'registration_content');
+						return true;
+			}else{
+				error_registration('passwords do not coincide');
+			}
+		return false;
+	}
+	function error_registration(msg){
+		alert(msg);
+	}
+	function finish_reg_to_site(){
+		var code = document.getElementById('code_reg').value;	
+		if (code != ""){
+		socket.emit('chat message', code, '', 'registration_finish');
+		}else{
+		error_registration('uncorrect code');
+		}
+	}
+	function send_room_name(){
+		
+			var datagram = choose_room.firstChild.innerHTML;
+		if (datagram != ''){
+			window.location.href = '/map/map.html/?id=' + datagram +'&'  + 'connect=' + 'yes';
+		}
+	}
+	// возвращает cookie с именем name, если есть, если нет, то undefined
+	function getCookie(name) {
+	  var matches = document.cookie.match(new RegExp(
+		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+	  ));
+	  return matches ? decodeURIComponent(matches[1]) : undefined;
+	}
+function send_post(login){
+	document.cookie = "userName=" + login;
+	}
+	
+function send_keys(login,key){
+
+	document.cookie = "userName=" + login;
+		document.cookie = "key=" + key;
+	}
+function resetOnce(name) { 
+  document.cookie = "userName=" + name + "; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = "key=" + name + "; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+}
+
+function coded(text,key){
+
+	var hex0 = [];
+	var hex1 = [];
+	var hex2 = [];
+	var result ='';
+
+	for (var i=0; i<text.length; i++){
+		
+		hex0[i] = (text.charCodeAt(i)).toString(16);  
+		hex1[i] = (key.charCodeAt(i)).toString(16);  
+		hex2[i] = parseInt(hex0[i],16 )+ parseInt(hex1[i],16);
+
+		result+=hex2[i].toString(16);;
+	}
+
+	return result;
+}
+function generate_key(len){
+	 key ='' ;
+	var str = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()QWERTYUIOPASDFGHJKLZXCVBNM';
+	for (var i=0; i<len; i++){
+		key += str[randomInteger(0,71)];
+	}//console.log('key = ' + key);
+
+	return key;
+}
+
+
+</script>
+</html>

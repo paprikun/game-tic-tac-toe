@@ -1,0 +1,376 @@
+
+/*Главная страница*/
+body {
+
+           background-color: #a2a2a2;
+            font-family: Trebuchet MS, Arial, Times New Roman;
+            font-size: 20px;
+			margin: 0; 
+
+}
+#container {
+
+		position:absolute;
+        
+            width: 100%;
+            height: 100vh;
+
+
+		  
+		  		  -webkit-user-select: none;
+    /* user-select -- это нестандартное свойство */
+
+    -moz-user-select: none;
+    /* поэтому нужны префиксы */
+
+    -ms-user-select: none;
+
+}
+#header {
+            background: #838283;
+            height: 100px;
+
+            width: 100%;
+			text-align: right;
+			
+			line-height: 4em;
+			}
+			
+			#exit{
+				width:10%;
+						margin-right:20px;
+			}
+	#exit:hover{
+		
+		color:white;
+		cursor:pointer;
+		margin
+	}
+
+#navigation_menu {
+            background: #a2a2a2;
+            width:300px;
+
+            height: 25px;
+			text-align: center;			
+			
+			}
+			
+		
+			
+#navigation_room {
+            background: #a2a2a2;
+			float:right;
+			width:calc(100% - 300px );
+            height: 25px;
+			text-align: center;
+
+}
+
+
+
+#menu {	
+			
+            background: #333333;
+            float: left;
+            width:300px;
+
+			min-height: 600px;
+			padding:0px;
+
+		-webkit-user-select: none;
+		/* user-select -- это нестандартное свойство */
+		-moz-user-select: none;
+		/* поэтому нужны префиксы */
+		-ms-user-select: none;
+}
+#content {
+        background: white;
+        height: 600px;			
+		float: left;
+        
+		width:calc(100% - 300px);
+		padding: 0px;
+		overflow:auto;
+		overflow-x: hidden;
+		
+}
+#content td{
+		border: 1px solid black;
+		background: gray;
+}
+#content tr:hover td{
+    background:black;
+	color:white;
+	cursor:pointer;
+}
+#content table{
+		margin: 0px;
+		width: 100%;
+}
+.colum1{
+		width:80%;
+}
+.colum2{
+		width:10%;
+		text-align:center;
+}
+#clear {
+            clear:both;			
+}
+/*Игровое меню*/
+ul#my_menu {
+		list-style-type: none; 
+		margin: 0; 
+		-webkit-user-select: none;
+		/* user-select -- это нестандартное свойство */
+		-moz-user-select: none;
+		/* поэтому нужны префиксы */
+		-ms-user-select: none;
+		padding-left:50%;
+}
+
+ul#my_menu li a{
+	color: Black; 
+	width: 200px;
+	height:30px;
+	text-decoration: none; 
+	display: block;	
+	outline: none; /* Убираем границу вокруг ссылок  */
+	cursor:pointer;
+	line-height:1.5em;
+	margin: 5px 0px 0px -100px;
+	background: green;
+	border-radius: 5px;	
+}
+ul#my_menu li a:hover{
+	background:LimeGreen;
+	color: White; 
+}
+ul#my_menu li a span{
+	text-align: center;
+	padding: 0px 0px 0 0px;
+	display: block;	
+}
+#search{	
+		width:100%;
+		margin: 5px 0 0 0;
+		padding-left:50%;
+}
+#find_on{
+	height: 30px;
+	width: 150px;
+	margin: 0 0 0 -75px;
+	
+}
+	#find_on{
+            font-size: 20px;
+	}	
+/*Лист комнат*/
+
+
+
+/*Регистрация*/
+#registration_new{
+			-webkit-user-select: none;
+		/* user-select -- это нестандартное свойство */
+		-moz-user-select: none;
+		/* поэтому нужны префиксы */
+		-ms-user-select: none;
+	
+	cursor:default;
+	border-radius: 10px;
+	position: absolute;
+	background:white;
+	
+	width: 600px;
+	top: 50%;
+	left: 50%;
+	margin-top: -300px;
+	margin-left:-300px;
+	overflow:inherit;
+	display:none;
+	
+	box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Параметры тени */
+}
+#registration_check:hover{
+	background:LimeGreen  ;
+	cursor:pointer;
+}
+#registration_check{
+	line-height:1.5em;
+	margin: 10px;
+	font-size: 20px; 
+	width:150px;
+	height: 2em;
+	background:green;
+	text-align:center;
+	border-radius: 5px;
+	float:right;
+}
+.registration_cancel:hover{
+	background:LimeGreen  ;
+	
+	cursor:pointer;
+}
+.registration_cancel{
+	line-height:1.5em;
+	margin: 10px;
+	font-size: 20px; 
+	width:150px;
+	height: 2em;
+	background:green;
+	text-align:center;
+	border-radius: 5px;
+	float:left;
+}
+
+#registration_ok:hover{
+	background:LimeGreen  ;
+	cursor:pointer;
+}
+#registration_ok{
+	line-height:1.5em;
+	margin: 10px;
+	font-size: 20px; 
+	width:150px;
+	height: 2em;
+	background:green;
+	text-align:center;
+	border-radius: 5px;
+	float:right;
+}
+#registration_new p{
+	margin:10px;
+}
+#reg_new_info{
+	display:none;
+}
+
+
+/*Восстановление пароля*/
+#step0_forgot_pass{
+	padding:10px;
+	display:none;
+}
+#step1_forgot_pass{
+	padding:10px;
+	display:none;
+}
+#step2_forgot_pass{
+	padding:10px;
+	display:none;
+}
+/*Авторизация*/
+#authorization{
+			-webkit-user-select: none;
+		/* user-select -- это нестандартное свойство */
+		-moz-user-select: none;
+		/* поэтому нужны префиксы */
+		-ms-user-select: none;
+	
+	cursor:default;
+	border-radius: 10px;
+	position: absolute;
+	background:white;
+
+	width: 500px;
+	top: 50%;
+	left: 50%;
+	margin-top: -200px;
+	margin-left:-200px;
+	
+	
+	box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Параметры тени */
+}
+/*Оформление таблиц окно авторизации, регистрации, восстановления пароля*/
+#registration{
+	display:none;
+}
+#registration input{
+	border-radius: 5px;
+	font-size:18px;
+	height: 30px;
+	width: 300px;
+}
+#registration tr{
+	height: 50px;
+}#registration table{
+	margin:20px;
+
+}
+#registration td{
+	width:40%;
+	
+}
+#registration h1{
+	padding-bottom: 20px;
+    border-bottom-width: 2px; /* Толщина линии внизу */
+    border-bottom-style: solid; /* Стиль линии внизу */
+    border-bottom-color: gray; /* Цвет линии внизу */
+}
+#login:hover{
+		cursor:text;
+}
+#pass:hover{
+		cursor:text;
+}
+.registration_ok{
+	line-height:1.5em;
+	margin: 10px;
+	font-size: 20px; 
+	width:150px;
+	height: 2em;
+	background:green;
+	text-align:center;
+	border-radius: 5px;
+	float:right;
+}
+.registration_ok:hover{
+	background:LimeGreen  ;
+	cursor:pointer;
+}
+
+.registration_ref0{
+	font-style: italic;
+	float:left;
+	margin:10px ;
+}
+.registration_ref0:hover{
+	color:green;
+	cursor:pointer;
+}
+.registration_ref1{
+	font-style: italic;
+	float:right;
+	margin:10px ;
+}
+.registration_ref1:hover{
+	color:green;
+	cursor:pointer;
+}
+#registration input[type="checkbox"]{
+	margin:10px ;
+
+}
+.check{
+
+	width:100%;
+	height:60px;
+
+
+}
+/*Стекло для диалогового окна*/
+	#glass{
+			
+		display:none;
+		width: 100%;
+		height: 100%;		
+		position:absolute;
+		opacity:0.5;
+		background:black;
+	}
+	
+
+
+

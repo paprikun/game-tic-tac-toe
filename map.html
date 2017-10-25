@@ -1,0 +1,680 @@
+<!doctype html>
+<html>
+<head>
+  <title>chat Socket.IO</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ 		<meta charset="utf-8"> 
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <link rel="stylesheet" type="text/css" href="/map/style_map.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<body>
+  <span id="dodo"></span>
+		<div id="header">
+		</div>
+		<div id="navigation_menu">
+			<div class = 'ref'> <a onmousedown = "if (confirm('Stop this game?')){backmenu(); };">Меню</a> </div>
+			<div class = 'ref'> <a onmousedown = "settings_button();">Настройки</a> </div>  
+			<div class = 'ref'> <a id="office">Логин</a> </div>
+			<div class = 'ref'> <a id="exit">Авторизация</a> </div>
+		</div>
+		<div id="navigation_map">
+			<!--<canvas id="can"  width = "480px"  height = "480px" onmousedown ="draw_element(event.layerX, event.layerY);"></canvas>
+	-->		
+		</div>
+		<div id="game">
+		</div>
+				<div id = "glass">
+				</div>
+			<div id="settings">
+				<div id="head_settings">
+					<div id="head_str_settings">
+						Настройки
+					</div>	
+					<div id="head_esc_settings" onclick = "esc_settings_click()">
+						X
+					</div>
+				</div>	
+				<div id="content_settings">
+						<table cellpadding="0" cellspacing="2">
+							<tr ><td class="col1" onclick = "change_colormap_but(this)">Цвет поля</td><td class="col2" id = "color_background" > </td></tr>
+							<tr ><td class="col1"onclick = "change_colorfield_but(this)">Цвет сетки</td><td class="col2" id = "color_dieze" > </td></tr>
+							<tr ><td class="col1"onclick = "change_color_x_but(this)">Цвет X</td><td class="col2" id = "color_x" > </td></tr>
+							<tr ><td class="col1"onclick = "change_color_0_but(this)">Цвет 0</td><td class="col2" id = "color_0" > </td></tr>				
+						</table>
+				</div>
+				<div id = "change_color">
+				</div>
+		</div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+//переменный canvas settings
+function resetOnce(name) { 
+  document.cookie = "userName=" + name + "; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+}
+	// возвращает cookie с именем name, если есть, если нет, то undefined
+	function getCookie(name) {
+	  var matches = document.cookie.match(new RegExp(
+		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+	  ));
+	  return matches ? decodeURIComponent(matches[1]) : undefined;
+	}
+	var username =  getCookie('userName'); 
+//	resetOnce(username);
+	if (username != null){
+		document.getElementById('office').style.display = "block";	
+		document.getElementById('exit').style.display = "block";	
+		document.getElementById('office').innerHTML = username + ' (Кабинет)';
+		document.getElementById('exit').innerHTML = 'Выход';
+	}else{
+		document.getElementById('office').style.display = "none";
+			document.getElementById('exit').style.display = "block";	
+	}
+	username = '';
+	var ct2  =document.createElement('canvas');
+	ct2.id = 'ct2';	
+	ct2.style.border = '1px inset gray';
+	//ct2.top = "270px";
+	ct2.width = 255;
+	ct2.height = 255;	
+	ct2.style.marginLeft = '20px';
+	ct2.style.marginTop = '10px';		
+	var con2 = ct2.getContext("2d");
+	con2.lineWidth = 0;
+	change_color.appendChild(ct2);
+	var ctt  =document.createElement('canvas');
+	ctt.id = 'ctt';
+	ctt.style.border = '1px inset gray';
+	ctt.width = 255;
+	ctt.height = 40;	
+	ctt.style.marginLeft = '20px';
+	ctt.style.marginTop = '275px';	
+	var con = ctt.getContext("2d");
+	con.lineWidth = 0;	
+	change_color.appendChild(ctt);
+	var div1d  =document.createElement('div');
+	div1d.id = "sight1d";
+	var div2d  =document.createElement('div');
+	div2d.id = "sight2d";
+	change_color.appendChild(div1d);
+	change_color.appendChild(div2d);
+		sight1d_marginLeft = 10;
+		var ctt_choose = 0;
+		var tr_settings_choose = 0;		
+	var choose_cursor1 = 1;
+	var settings = document.getElementById("settings");
+	var color_background_value = 'rgb(42,33,28)';
+	var color_dieze_value = 'rgb(184, 174, 157)';
+	var color_x_value = 'rgb(0, 65, 188)';
+	var color_0_value = 'rgb(0, 188, 0)';
+	function esc_settings_click(){
+	glass.style.display = 'none';
+	document.body.style.overflow = "";//разрешаем прокрутку
+	settings.style.display = 'none';
+		var all = document.getElementsByClassName("col1");
+	for ( var i = 0; i < all.length; i ++ ){
+		var input = all[i];
+		input.style.backgroundColor  = '';
+		//input.style.transitionProperty = 'background';	
+		//input.style.transitionDuration = '1s';
+	}
+	can_dieze.style.backgroundColor = color_background_value;
+	draw_map();
+	for (var i = 0; i <map.lenght; i++){
+		var str = map[i].split(":");
+		draw_pic(str[0],str[1],str[2],0,1);
+	}
+	//change_color_tr(0);
+	setting_choose = -1;
+	}
+	function color_to_gray(color, gray){
+		var dcolor;
+	if (color < 128){
+		dcolor = (128 - color)/255 * gray;
+		dcolor = Math.round(color + dcolor);
+	}else{
+		dcolor= (color - 128)/255 * gray;
+		dcolor = Math.round(color - dcolor);
+	}
+		return dcolor;
+	}
+	function rgb_to_gray(r,g,b,gray){
+			var red = color_to_gray(r,gray);
+			var green = color_to_gray(g,gray);
+			var blue = color_to_gray(b,gray);		
+			var color = "rgb(" + red + "," + green + "," + blue + ")";//
+			return color;
+	}
+	function create_color(){
+		var CM = 255;
+		var i6 = Math.round (CM/6);
+		var red = 0;
+		var green = 0;
+		var blue = 0;	
+		for (var gray = 0; gray <255; gray++){
+					for (var i=0; i<i6; i++)
+					{
+						red = 255;
+						green = i*6;
+						blue = 0;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}
+					for (var i=i6; i<2*i6; i++)
+					{
+						red = 255 - (i - i6) * 6;
+						green = 255;
+						blue = 0;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}		
+					for (var i=2*i6; i<3*i6; i++)
+					{
+						red = 0;
+						green = 255;
+						blue = (i-(2*i6))*6;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}		
+					for (var i=3*i6; i<4*i6; i++)
+					{
+						red = 0;
+						green = 255 - (i - 3*i6) * 6;;
+						blue = 255;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}	
+					for (var i=4*i6; i<5*i6; i++)
+					{
+						red =  (i-(4*i6))*6;;
+						green = 0;
+						blue = 255;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}			
+					for (var i=5*i6; i<6*i6; i++)
+					{
+						red =  255;
+						green = 0;
+						blue =  255 - (i - 5*i6) * 6;
+						con2.fillStyle  = rgb_to_gray(red,green,blue,gray);
+						con2.fillRect(i,gray, 1, 1);	
+					}		
+		}
+							draw_settings_1d(con, 255, 0, 0);
+			//var red0 = 128;
+			//var green0 = 255;
+			//var blue0 = 0;
+	}
+		function set_cursor(eventx, eventy){
+			if (ctt_choose == 1){
+									var pos = $(ct2).offset();
+									var elem_left = pos.left;
+									var elem_top = pos.top;
+									var x = eventx - elem_left + 10;
+									var y = eventy - elem_top;
+									if (x < 10) { x =  + 10; }
+									if (y < 0) { y = 0; }
+									if (x > 254.5  + 10 ) { x =254.5  + 10 ; }
+									if (y > 254.5) { y = 254.5; }
+										sight2d.style.marginLeft = x + 'px';
+										sight2d.style.marginTop = y + 'px';
+										var imgData=con2.getImageData(x-10,y,1,1);
+										var red0 = imgData.data[0];
+										var green0 = imgData.data[1];
+										var blue0 = imgData.data[2];
+										draw_settings_1d(con, red0, green0, blue0);
+										draw_tr_settings_choose(sight1d_marginLeft,5);
+						}
+						else if (ctt_choose == 2){
+								var pos2 = $(ctt).offset();
+								var elem_left2 = pos2.left;
+								var x2 = eventx  - elem_left2 + 10;;
+								if (x2 < 10) { x2 =  + 10; }
+								if (x2 > 254.5  +10) { x2 =254.5  + 10 ; }
+								sight1d.style.marginLeft = x2 + 'px';
+								draw_tr_settings_choose(x2, 5);	
+								sight1d_marginLeft = x2;
+						}
+		}
+			ct2.onmousedown = function (event){
+			ctt_choose = 1;
+			set_cursor(event.pageX, event.pageY);
+			} 
+			ctt.onmousedown  = function (event){
+			ctt_choose = 2;
+			set_cursor(event.pageX, event.pageY);
+			}  			
+			sight2d.onmousedown = function (event){
+			ctt_choose = 1;
+			set_cursor(event.pageX, event.pageY);
+			} 
+			sight1d.onmousedown  = function (event){
+			ctt_choose = 2;
+			set_cursor(event.pageX, event.pageY);
+			}  
+			window.onmouseup = function(){
+			ctt_choose = 0;
+			} 
+			settings.onmousemove  = function cursor2d(event){//2d			
+						set_cursor(event.pageX, event.pageY);
+			}
+function draw_tr_settings_choose(x,y){
+		var imgData=con.getImageData(x-10,y,1,1);
+		var red3 = imgData.data[0];
+		var green3 = imgData.data[1];
+		var blue3 = imgData.data[2];
+		var color = "rgb(" + red3 + "," + green3 + "," + blue3 + ")";//
+		if (tr_settings_choose == 1){
+			color_background.style.backgroundColor = color;
+			color_background_value = color;
+		}else if (tr_settings_choose == 2){
+			color_dieze.style.backgroundColor = color;		
+			color_dieze_value = color;
+		}else if (tr_settings_choose == 3){
+			color_x.style.backgroundColor = color;		
+			color_x_value = color;
+		}else if (tr_settings_choose == 4){
+			color_0.style.backgroundColor = color;		
+			color_0_value = color;
+		}
+}
+		function draw_settings_1d(con,red0,green0,blue0){	
+			var red1 ;
+			var green1 ;
+			var blue1 ;	
+				for (var r = 0; r < 255; r++){
+						if (r<127){
+						red1 = red0/128 * r;
+						green1 = green0/128 * r;
+						blue1 = blue0/128 * r;
+						}else{
+						red1 = red0 + (255 - red0)/128 * (r - 128);
+						green1 = green0 + (255 - green0)/128 * (r - 128);
+						blue1 =blue0 + (255 - blue0)/128 * (r - 128);
+						}
+						red1 = Math.round(red1);
+						green1 = Math.round(green1);
+						blue1 = Math.round(blue1);
+						con.fillStyle  ="rgb(" + red1 + "," + green1 + "," + blue1 + ")";//
+						con.fillRect(r, 0, 1, 40);	
+				}
+		}
+	function change_color_tr(elem){
+	var all = document.getElementsByClassName("col1");
+	for ( var i = 0; i < all.length; i ++ ){
+		var input = all[i];
+		input.style.backgroundColor  = '';
+		//input.style.transitionProperty = 'background';	
+		//input.style.transitionDuration = '1s';
+	}
+	elem.style.backgroundColor  = '#AAAAAA';
+	//elem.style.transitionProperty = 'background';	
+	//elem.style.transitionDuration = '1s';
+	}
+	function change_colormap_but(elem){
+	tr_settings_choose = 1;
+	change_color_tr(elem);
+	}
+	function change_colorfield_but(elem){
+	tr_settings_choose = 2;
+		change_color_tr(elem);
+	}
+	function change_color_x_but(elem){
+	tr_settings_choose = 3;
+		change_color_tr(elem);
+	}
+	function change_color_0_but(elem){
+	tr_settings_choose = 4;
+		change_color_tr(elem);
+	}	
+</script>
+<!--draw -->
+  <script >
+										create_color();
+						function $_GET(key) {
+						var s = window.location.search;
+						s = s.match(new RegExp(key + '=([^&=]+)'));
+						return s ? s[1] : false;
+						}
+						var can = document.createElement('canvas');		
+						can.id = "can";
+						var can_dieze = document.createElement('canvas');		
+						can_dieze.id = "can_dieze";						
+						var height_ = document.documentElement.clientWidth;
+						var width_ = document.documentElement.clientWidth;
+						var mobile = 1;
+						if (!mobile){
+							height_ = width_;
+						}else{
+							width_ = height_;
+						}
+						can.width = width_;
+						can.height = height_;
+						can_dieze.width = width_;
+						can_dieze.height = height_;
+						//can.onmousedown = draw_element(event.layerX, event.layerY);
+					//	can.onmousedown = "draw_element(event.layerX, event.layerY);"
+					//	can.innerHTML = 'width = "480px" height = "480px"' ;
+											navigation_map.appendChild(can_dieze);	//		list.appendChild(newLi);	
+						navigation_map.appendChild(can);	//		list.appendChild(newLi);	
+						var c_canvas_dieze = document.getElementById("can_dieze");
+						var contex_dieze = c_canvas_dieze.getContext("2d");
+						var c_canvas = document.getElementById("can");
+						var context = c_canvas.getContext("2d");
+						can.style.position = "absolute";
+						can_dieze.style.position = "absolute";
+						var count_cell = 12;
+						var shift = 10.5;//window.shift
+						var shiftdx = (screen.width-width_-2*shift)/2;
+						shiftdx = 0;
+						var stepx =Math.round ((width_ - 2*shift) / count_cell) ;
+						var stepy =Math.round( (height_ - 2*shift) / count_cell );
+						var lineWidth_ = 1;
+						base_imageX = new Image();
+						base_image0 = new Image();			
+						base_imageZ = new Image();								
+						base_image0.src = 'img/texture_o3.png';		
+						base_imageX.src = 'img/texture_x3.png';
+						base_imageZ.src = 'img/menu_active.png';
+						var map =new Array();
+						map.lenght = 0;
+						var type  = 2;//1 - x, 2 - 0
+						var move = 0;
+						var last_x;
+						var last_y;
+						var driveon = 1;
+						var top_drive = 30;					
+						var socket = io();	
+						draw_map();
+						
+		function exit_all(){
+		
+		
+		socket.emit('chat message', '', '', 'close session');
+		backmenu();
+		}				
+	function backmenu(){
+		socket.disconnect();
+		window.location.href = '/';
+		
+								//	socket.emit('chat message', send_msg, 'user', 'room01_coordinates');
+	}
+	function settings_button(){
+			glass.style.display = 'block';
+			settings.style.display = 'block';
+			document.body.style.overflow = "hidden";//запрещаем прокрутку
+			color_background.style.backgroundColor = color_background_value;
+			color_dieze.style.backgroundColor = color_dieze_value;
+			color_0.style.backgroundColor = color_0_value;
+			color_x.style.backgroundColor = color_x_value;
+			tr_settings_choose = 1;
+			content.settings.getElementsByClassName('col1')[0].style.backgroundColor  = '#AAAAAA';
+	}
+							if ( $_GET('connect') == 'yes'){
+							//alert('connect');
+							socket.emit('chat message', $_GET('id'), 'user', 'room01_connect');
+						}else{
+							var nameroom =  $_GET('id');
+							if (nameroom == '')
+							{
+							backmenu();
+							}
+							else{
+							//alert('create');
+							socket.emit('chat message', $_GET('id'), 'user', 'room01_create');
+							}
+						}
+						function draw_map(){
+							contex_dieze.beginPath();
+							for (var i=0; i<count_cell+1; i++){
+							contex_dieze.moveTo(shift + i*stepx, shift);
+							contex_dieze.lineTo(shift+ i*stepx, height_-shift);
+							}
+							for (var i=0; i<count_cell+1; i++){
+							contex_dieze.moveTo(shift, shift+i*stepy);
+							contex_dieze.lineTo(width_-shift,shift+i*stepy);
+							}
+							contex_dieze.lineWidth = lineWidth_*2;	
+							contex_dieze.strokeStyle = color_dieze_value;//
+							contex_dieze.strokeRect(0, 0, c_canvas.width, c_canvas.height);
+							contex_dieze.lineWidth = lineWidth_;
+							contex_dieze.strokeStyle =color_dieze_value;//
+							contex_dieze.stroke();
+							contex_dieze.closePath();
+						}
+						function add_element(x, y, type){
+						//проверка что клетка пустая. Добавление в массив нового элемента если клетка пустая.
+							//alert("x = " + x + "y = " + y + "type = "+ type);
+							var check_flag = true;
+							for (var i=0; i<map.lenght; i++){
+								element = map[i].split(':');
+								if (element[0] == x && element[1] == y){//проверка что такого элемента нет в массиве
+									check_flag = false;
+								}
+							}
+								if (check_flag == true){
+								//var new_alement = x + ':' + y + ':' + type;
+								//	map.push(new_alement);		
+								//	map.lenght++;				
+									//alert('true add, map.lenght = ' + map.lenght);
+								}else{
+									alert('false add');
+								}
+							return check_flag;
+						}
+						function check_victory(){
+						for (var j=0; j< map.lenght; j++){
+							var linemap = map[j].split(":");
+							var horizontal = [];
+							var vertical = [];
+							var up_to_rightdown = [];
+							var down_to_rightup = [];
+							var vic_hor = 0;
+							var vic_ver = 0;
+							var vic_up_rd = 0;
+							var vic_down_ru = 0;							
+							//собираем проверочные линии из 5 элементов
+											for (var ih = 0; ih<5; ih++){
+												horizontal[ih]           = +(+linemap[0] + ih) + ":" + linemap[1] + ":" + linemap[2];  
+												vertical[ih]               =      linemap[0] + ":" +   (+linemap[1]  + ih)+ ":" + linemap[2];  
+												up_to_rightdown[ih] = +(+linemap[0] + ih) + ":" +  (+linemap[1]  + ih)+ ":" + linemap[2];  
+												down_to_rightup[ih] = +(+linemap[0] - ih) + ":" +  (+linemap[1]  + ih)+ ":" + linemap[2];  												
+											}
+												//alert("lines:" + horizontal[0]);	
+											//проверяем совпадение элементов rкаждой линии и основного массива. Должно получиться 5 совпадений с одной из линий
+											for (var i=0; i< map.lenght; i++){
+													for (var n=0; n< 5; n++){
+														if (map[i] == horizontal[n]){
+															vic_hor++;
+														}
+														if (map[i] == vertical[n]){
+															vic_ver++;
+														}
+														if (map[i] == up_to_rightdown[n]){
+															vic_up_rd++;
+														}
+														if (map[i] == down_to_rightup[n]){
+															vic_down_ru++;
+														}														
+													}											
+											}
+											if (vic_hor == 5 || vic_ver == 5 || vic_up_rd == 5 || vic_down_ru == 5){
+													move = 0;
+													var vicLine = [];
+													if (vic_hor == 5){
+													vicLine = horizontal;
+													}else if (vic_ver == 5){
+													vicLine = vertical;
+													}else if (vic_up_rd == 5){
+													vicLine = up_to_rightdown;
+													}else if (vic_down_ru == 5){
+													vicLine = down_to_rightup;
+													}
+													for (var tt = 0; tt< 5; tt++){
+													var temp0 = vicLine[tt];
+													var templine = temp0.split(":");
+													}
+													context.moveTo(shift, shift+i*stepy);
+													context.lineTo(width_-shift,shift+i*stepy);
+													if (templine[2] == type){
+														alert('You win!');
+														move = 0;
+													}else {
+														alert('You lose...');
+														move = 0;
+													}
+													socket.disconnect();
+													window.location.href = '/';
+													//return;
+											}else{
+											//alert('vic = ' + vic);
+											vic_hor = 0;
+											vic_ver = 0;
+											up_to_rightdown = 0;
+											}
+							}	
+						}
+						function integerDivision(x, y){
+						return (x-x%y);
+					}
+					can.onmousedown=	function draw_element(event){	
+					var x_temp = event.layerX;
+					var y_temp = event.layerY;
+					//alert('click on canvas x=' + x_temp + 'y=' + y_temp);
+							//проверяем что попали в поле	
+							if (shift<x_temp && x_temp < (shift + stepx * count_cell ) &&
+								shift<y_temp && y_temp < (shift +  stepy * count_cell )  && move==1)
+							{
+							var xx =  integerDivision (x_temp - shift, stepx) / stepx ;
+							var yy =  integerDivision (y_temp - shift, stepy)  / stepy;
+							if (map.lenght == 0){
+								type = 1;
+							}							
+							if (! add_element(xx, yy, 1))//добавляем элемент в массив если поле пустое
+							{
+								return false;
+							}
+							move  = 0;//заморозка	
+							var send_msg = xx + ":" + yy + ":" + type;		
+							socket.emit('chat message', send_msg, 'user', 'room01_coordinates');
+							//draw_pic(xx,yy,1);
+						}
+						}
+	function draw_pic(x_temp, y_temp, type_temp, alpha, fps){		
+		var min_shift = lineWidth_; //борты внутри клетки
+		var w = stepx - 2*min_shift; //ширина и высота фигуры
+		var dx = shift  +  x_temp * stepx + min_shift ;//расположение по оси x
+		var dy = shift  +  y_temp * stepy + min_shift ;//расположение по оси y
+			//context.drawImage(base_imageX, dx,dy,w,w);
+			drawImageWithAnim(type_temp,dx,dy,w,w, alpha, fps);				
+		//drawFigure(type_temp,dx,dy,w,w)
+		}
+	function drawFigure(figure,dx,dy,w,w,fps){
+		var step_map = w/10;	//отступ
+			if (figure == 1){
+			context.beginPath(); 
+			context.lineWidth = step_map;
+			context.strokeStyle = color_x_value;
+			if (fps >= 5){
+				fps -= 5;
+				context.moveTo(dx + step_map,dy + step_map);
+				var sdd_right = (w - 2*step_map) * (5 - fps) / 5;	
+				context.lineTo(dx + step_map + sdd_right,dy +  step_map + sdd_right);
+				context.lineCap = "round";	
+				context.stroke();
+			}
+			else if(fps < 5){
+				context.lineCap = "round";	
+				context.moveTo(dx + step_map,dy + step_map);
+				context.lineTo(dx + step_map + w - 2*step_map ,dy +  step_map + w - 2*step_map);
+				context.stroke();
+				context.moveTo(dx + step_map,dy + w - step_map  );
+				var sdd_left = (w - 2*step_map) * (5 - fps) / 5;
+				context.lineTo(dx + step_map + sdd_left,dy + w - step_map - sdd_left);
+			context.stroke();			
+			}
+			context.closePath(); 		
+		}else if (figure == 2){
+			context.beginPath(); 
+			context.lineWidth = step_map;
+			context.strokeStyle = color_0_value;
+			context.lineCap = "round";	
+			context.arc(dx +w/2, dy + w/2, w/2 - step_map,-Math.PI/2, -Math.PI/2 + 2*(10 - fps)/10*Math.PI,false); 
+			context.stroke();
+			context.closePath(); 
+		}
+	}
+	function drawImageWithAnim(type_, dx,dy,w,w,alpha,fps){
+		if (fps == 0){
+			check_victory();
+			return;
+		}
+		//alert('go');
+		fps--;
+			context.clearRect(dx, dy, w, w);
+		//context.globalAlpha = alpha;
+		alpha += 0.02;
+			drawFigure(type_,dx,dy,w,w,fps);
+		//alert(fps + " " + dx + " " + dy);
+		setTimeout("drawImageWithAnim(" + type_ + "," + dx + "," + dy + "," + w + "," + w + "," + alpha + "," + fps + ")",50);
+	}
+<!--client -->	
+				$(function() {
+				  //var socket = io();
+				  socket.on('chat message', function(msg, name, dodo) {
+				  if (dodo == 'room01_coordinates'){
+										str = msg.split(":");
+										ddx = str[0];
+										ddy = str[1];
+										ddtype = str[2];				
+									if (0 <= ddx && ddx <= count_cell && 0 <= ddy && ddy <= count_cell)
+								{									
+											draw_pic(ddx,ddy,ddtype,0.1,10);
+											map.push(msg);		
+											map.lenght++;	
+											if (ddtype == type){//если пришло подтверждение, сделанного нами хода, то
+											  move  = 1;//заморозка
+											}else{
+												move = 1;
+											}
+											//check_victory();
+									}
+						}else if (dodo == "are you here"){
+							socket.emit('chat message', 'send_msg', 'user', 'yes here');
+						}else if (dodo == "opponent1 exit" || dodo == "opponent2 exit" ) {
+							alert(dodo);
+							socket.emit('chat message', $_GET('id'), 'user', 'room01_create');
+						}else if (dodo == "no place for you"){
+							alert(dodo);
+						}else if (dodo == "connect to you"){
+							if (confirm(name + ' want ' + dodo)){
+								move = 1;
+							}else{
+								socket.emit('chat message', 'msg', name, 'cancel connect');//откза в игре с этим сопериником
+							}
+						}else if (dodo == 'opponent does not want play with you'){
+							alert(dodo);
+						}else if (dodo == 'room is exist'){
+						alert(dodo);
+						backmenu();
+						}
+				  });
+				});
+		office.onclick = function(){
+			alert('office');
+		}
+		exit.onclick = function(){
+			if (getCookie('userName') != null){
+				if (confirm('Log out of the account?')){
+					resetOnce('resetOnce');
+					backmenu();
+					}
+			}else{
+					backmenu();
+			}
+		}
+	</script>
+</body>
+</html>
